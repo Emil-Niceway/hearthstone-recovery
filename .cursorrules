@@ -1,0 +1,7 @@
+# Rules
+
+- Use pnpm instead of npm
+- Use TypeScript instead of JavaScript
+- Use Vite instead of Webpack
+- Use React instead of vanilla JS
+- Use TailwindCSS instead of vanilla CSS
