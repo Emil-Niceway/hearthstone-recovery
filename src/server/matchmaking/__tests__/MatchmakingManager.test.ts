@@ -1,19 +1,13 @@
-import { Server } from "socket.io";
 import { MatchmakingManager } from "../MatchmakingManager";
 import { LobbyManager } from "../LobbyManager";
 import { GameSocket } from "../../types/socket";
 
 describe("MatchmakingManager", () => {
   let matchmakingManager: MatchmakingManager;
-  let mockIo: jest.Mocked<Server>;
   let mockLobbyManager: jest.Mocked<LobbyManager>;
   let mockSocket: jest.Mocked<GameSocket>;
 
   beforeEach(() => {
-    mockIo = {
-      emit: jest.fn(),
-    } as unknown as jest.Mocked<Server>;
-
     mockLobbyManager = {
       createLobby: jest.fn().mockReturnValue("test_game"),
       addPlayer: jest.fn().mockReturnValue(true),
@@ -29,7 +23,7 @@ describe("MatchmakingManager", () => {
       id: "test_socket_id",
     } as unknown as jest.Mocked<GameSocket>;
 
-    matchmakingManager = new MatchmakingManager(mockIo, mockLobbyManager);
+    matchmakingManager = new MatchmakingManager(mockLobbyManager);
   });
 
   describe("addToQueue", () => {
