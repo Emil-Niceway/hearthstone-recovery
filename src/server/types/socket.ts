@@ -14,7 +14,7 @@ export interface ServerToClientEvents {
   "lobby:players": (players: Array<{ id: string; ready: boolean }>) => void;
   "lobby:typing": (data: { playerId: string; isTyping: boolean }) => void;
   "game:step_update": (data: {
-    playerId: string;
+    playerStates: Record<string, number>;
     gameId: string;
     step: number;
   }) => void;

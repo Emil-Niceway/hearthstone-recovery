@@ -1,5 +1,5 @@
 import EventEmitter from "events";
-import { Server, Socket } from "socket.io";
+import { Socket } from "socket.io";
 import { LobbyManager } from "./LobbyManager";
 import { GameSocket } from "../types/socket";
 import { ServerLogger } from "../utils/serverLogger";
@@ -17,7 +17,7 @@ export class MatchmakingManager extends EventEmitter {
   private queues: Map<number, QueuedPlayer[]> = new Map();
   private matchTimeout: number = 30000;
 
-  constructor(private io: Server, private lobbyManager: LobbyManager) {
+  constructor(private lobbyManager: LobbyManager) {
     super();
   }
 

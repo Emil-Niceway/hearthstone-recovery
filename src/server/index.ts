@@ -35,14 +35,14 @@ if (process.env.NODE_ENV === "production") {
   app.use(express.static("dist/client"));
 
   // Handle client-side routing
-  app.get("*", (req, res) => {
+  app.get("*", (_, res) => {
     res.sendFile(path.resolve("dist/client/index.html"));
   });
 }
 
 const gameStateManager = new GameStateManager(io);
 const lobbyManager = new LobbyManager(io, gameStateManager);
-const matchmaking = new MatchmakingManager(io, lobbyManager);
+const matchmaking = new MatchmakingManager(lobbyManager);
 const logger = new ServerLogger();
 
 io.on("connection", (socket) => {
