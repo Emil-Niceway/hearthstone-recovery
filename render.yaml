@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: hearthstone-recovery
+    name: gaming-therapy
     env: node
     buildCommand: npm run render-build
     startCommand: npm run start
