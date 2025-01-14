@@ -60,15 +60,15 @@ export interface GameTimers {
 }
 
 export interface GameState {
-  gameId: string;
-  players: Map<string, Player>;
-  phase: GamePhase;
+  players: Set<string>;
+  playerStates: Record<string, number>;
+  confessions: Array<{ playerId: string; message: string }>;
+  readyForNextStep: Set<string>;
 }
 
 // View of the game state specific to each player
 export interface PlayerGameState {
-  gameId: string;
-  playerId: string;
-  playerIndex: number;
-  phase: GamePhase;
+  playerStates: Record<string, number>;
+  confessions: Array<{ playerId: string; message: string }>;
+  readyForNextStep: string[];
 }

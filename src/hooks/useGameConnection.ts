@@ -10,7 +10,7 @@ export function useGameConnection() {
   const [matchmakingStatus, setMatchmakingStatus] = useState<
     "idle" | "searching" | "found" | "joining"
   >("idle");
-  const [gameId, setGameId] = useState<string | null>(null);
+  const [gameId, setGameId] = useState<string>("");
   const [error, setError] = useState<string | null>(null);
   const [playerId] = useState<string>(
     () =>
@@ -131,7 +131,7 @@ export function useGameConnection() {
   const leaveLobby = () => {
     if (gameId) {
       socket?.emit("lobby:leave", gameId);
-      setGameId(null);
+      setGameId("");
       setMatchmakingStatus("idle");
     }
   };

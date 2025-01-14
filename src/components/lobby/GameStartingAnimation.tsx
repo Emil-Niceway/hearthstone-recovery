@@ -127,7 +127,7 @@ export function GameStartingAnimation({
               className="text-5xl font-bold bg-clip-text text-transparent 
                 bg-gradient-to-r from-[#FF9966] to-[#FF5E62] drop-shadow-[0_0_15px_rgba(255,94,98,0.6)]"
             >
-              Battle Begins!
+              Group Therapy Starting!
             </motion.h2>
             <motion.p
               initial={{ opacity: 0 }}
@@ -140,7 +140,7 @@ export function GameStartingAnimation({
               transition={{ delay: 0.7 }}
               className="mt-3 text-lg text-white/70"
             >
-              Prepare for combat...
+              Time to face your gaming addiction...
             </motion.p>
           </div>
         </motion.div>

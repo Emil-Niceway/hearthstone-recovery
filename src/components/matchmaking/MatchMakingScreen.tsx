@@ -48,7 +48,7 @@ export function MatchmakingScreen({
           >
             <h1 className="text-6xl font-bold tracking-tight">
               <span className="bg-clip-text text-transparent bg-gradient-to-r from-[#FF5E62] via-[#FF9966] to-[#FF5E62]">
-                Hearthstone Recovery
+                Git Gud Therapy
               </span>
             </h1>
             <p className="mt-2 text-white/50">Choose your path to redemption</p>

@@ -68,6 +68,14 @@ io.on("connection", (socket) => {
     matchmaking.removeFromQueue(playerId);
   });
 
+  socket.on("game:step_update", ({ gameId, playerId, step }) => {
+    gameStateManager.handleStepUpdate(gameId, playerId, step);
+  });
+
+  socket.on("game:confession", ({ gameId, playerId, message }) => {
+    gameStateManager.handleConfession(gameId, playerId, message);
+  });
+
   socket.on("matchmaking:found", (gameId) => {
     // Join the game room
     socket.join(gameId);
@@ -108,6 +116,11 @@ io.on("connection", (socket) => {
       playerId,
       isTyping,
     });
+  });
+
+  socket.on("game:player_ready_for_step", ({ gameId, playerId, step }) => {
+    logger.game("Player ready for step", { gameId, playerId, step });
+    gameStateManager.handleStepUpdate(gameId, playerId, step);
   });
 
   socket.on("lobby:message", ({ gameId, message }) => {

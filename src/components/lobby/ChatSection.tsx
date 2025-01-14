@@ -20,7 +20,7 @@ interface ChatSectionProps {
   messages: Message[];
   currentPlayerId: string;
   gameId: string;
-  socket: Socket<ServerToClientEvents, ClientToServerEvents>;
+  socket: Socket<ServerToClientEvents, ClientToServerEvents> | null;
   onSendMessage: (message: string) => void;
 }
 
@@ -47,6 +47,7 @@ export function ChatSection({
   }, [messages, autoScroll, typingUsers]);
 
   useEffect(() => {
+    if (!socket) return;
     socket.on("lobby:typing", ({ playerId, isTyping }) => {
       logger.network("Typing event received", {
         playerId,
@@ -69,6 +70,7 @@ export function ChatSection({
   }, [socket]);
 
   useEffect(() => {
+    if (!socket) return;
     return () => {
       if (typingTimeoutRef.current) {
         clearTimeout(typingTimeoutRef.current);
@@ -79,6 +81,7 @@ export function ChatSection({
   }, [socket, gameId]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!socket) return;
     setMessageInput(e.target.value);
 
     // Only emit typing events if the input is not empty
@@ -105,6 +108,7 @@ export function ChatSection({
   };
 
   const handleSendMessage = () => {
+    if (!socket) return;
     if (!messageInput.trim()) return;
     onSendMessage(messageInput);
     setMessageInput("");

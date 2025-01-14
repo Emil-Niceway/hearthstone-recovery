@@ -40,6 +40,17 @@ export function LobbyScreen({
   const [isGameStarting, setIsGameStarting] = useState(false);
 
   useEffect(() => {
+    // Add initial therapy message
+    setMessages([
+      {
+        playerId: "system",
+        message:
+          "Welcome to your intervention. Take a moment to share what brought you here today...",
+      },
+    ]);
+  }, []);
+
+  useEffect(() => {
     socket.emit("lobby:players", gameId);
 
     socket.on("lobby:players", (updatedPlayers) => {
@@ -108,7 +119,7 @@ export function LobbyScreen({
           animate={{ opacity: 1, y: 0 }}
           className="w-full max-w-2xl"
         >
-          <Card className="p-6 bg-[#12121A] border-0">
+          <Card className="p-6 bg-[#12121A] border-0 shadow-xl shadow-black/20">
             <div className="space-y-6">
               <div className="flex items-center justify-between">
                 <div>
@@ -169,12 +180,12 @@ export function LobbyScreen({
                     {isReady ? (
                       <>
                         <CheckCircle2 className="w-4 h-4" />
-                        <span>Ready!</span>
+                        <span>I Accept Help</span>
                       </>
                     ) : (
                       <>
                         <Sword className="w-4 h-4" />
-                        <span>Ready for Battle</span>
+                        <span>Begin Recovery</span>
                       </>
                     )}
                   </div>

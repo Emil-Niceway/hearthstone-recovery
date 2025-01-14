@@ -4,8 +4,8 @@ import { GameMode } from "./types";
 export const gameModes: GameMode[] = [
   {
     id: "1v1",
-    title: "Solo Recovery",
-    description: "Begin your healing journey alone",
+    title: "Buddy System",
+    description: "Find a recovery partner",
     icon: <Swords className="w-8 h-8" />,
     players: 2,
   },

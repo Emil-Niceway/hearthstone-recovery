@@ -5,7 +5,15 @@ import { ServerLogger } from "../utils/serverLogger";
 const logger = new ServerLogger();
 
 export class GameStateManager {
-  private games: Map<string, GameState> = new Map();
+  private games: Map<
+    string,
+    {
+      players: Set<string>;
+      playerStates: Record<string, number>;
+      confessions: Array<{ playerId: string; message: string }>;
+      readyForNextStep: Set<string>; // Track who's ready to proceed
+    }
+  > = new Map();
 
   constructor(private io: Server) {}
 
@@ -18,9 +26,10 @@ export class GameStateManager {
 
     // Create initial game state
     const initialState: GameState = {
-      gameId,
-      players: new Map(),
-      phase: "preparation",
+      players: new Set(players),
+      playerStates: {},
+      confessions: [],
+      readyForNextStep: new Set(),
     };
 
     this.games.set(gameId, initialState);
@@ -38,35 +47,96 @@ export class GameStateManager {
     }, 3000); // Match animation duration (2.5s) plus a small buffer
   }
 
-  public addPlayerToGame(gameId: string, playerId: string) {
+  handleStepUpdate(gameId: string, playerId: string, step: number) {
     const game = this.games.get(gameId);
     if (!game) {
-      logger.game("Failed to add player - game not found", {
-        gameId,
-        playerId,
-      });
+      logger.game("Game not found for step update", { gameId });
       return;
     }
 
-    // Check if player is already in the game state
-    if (!game.players.has(playerId)) {
-      logger.game("Adding player to game", { gameId, playerId });
+    logger.game("Player ready for step", { gameId, playerId, step });
+
+    // Add player to ready set
+    game.readyForNextStep.add(playerId);
+
+    // Broadcast ready status first
+    this.io.to(gameId).emit("game:player_ready_for_step", {
+      gameId,
+      playerId,
+      step,
+    });
+
+    // Check if all players are ready
+    const allPlayersReady = Array.from(game.players).every((pid) =>
+      game.readyForNextStep.has(pid)
+    );
+
+    logger.game("Ready status", {
+      allPlayersReady,
+      readyPlayers: Array.from(game.readyForNextStep),
+      totalPlayers: Array.from(game.players),
+    });
+
+    if (allPlayersReady) {
+      // Update all players' states to the new step
+      game.players.forEach((pid) => {
+        game.playerStates[pid] = step;
+      });
+
+      // Clear ready set for next step
+      game.readyForNextStep.clear();
+
+      // Broadcast the step update to all players
+      this.io.to(gameId).emit("game:step_update", {
+        gameId,
+        playerStates: game.playerStates,
+        step,
+      });
+
+      logger.game("Step update broadcast", {
+        gameId,
+        step,
+        playerStates: game.playerStates,
+      });
     }
 
-    game.players.set(playerId, {
-      id: playerId,
-      gold: 3,
-      shopSlots: [],
-      playerIndex: 0,
-    });
+    // Always broadcast updated game state
+    this.broadcastGameState(gameId);
   }
 
-  public handlePlayerDisconnect(gameId: string, playerId: string) {
+  handleConfession(gameId: string, playerId: string, message: string) {
+    const game = this.games.get(gameId);
+    if (!game) return;
+
+    game.confessions.push({ playerId, message });
+    this.broadcastGameState(gameId);
+  }
+
+  handlePlayerDisconnect(gameId: string, playerId: string) {
     const game = this.games.get(gameId);
     if (!game) return;
 
     game.players.delete(playerId);
-    this.broadcastGameState(gameId);
+    delete game.playerStates[playerId];
+
+    if (game.players.size === 0) {
+      this.games.delete(gameId);
+    }
+  }
+
+  public addPlayerToGame(gameId: string, playerId: string) {
+    if (!this.games.has(gameId)) {
+      this.games.set(gameId, {
+        players: new Set(),
+        playerStates: {},
+        confessions: [],
+        readyForNextStep: new Set(),
+      });
+    }
+
+    const game = this.games.get(gameId)!;
+    game.players.add(playerId);
+    game.playerStates[playerId] = 0;
   }
 
   public startGame(gameId: string) {
@@ -82,22 +152,12 @@ export class GameStateManager {
 
   private broadcastGameState(gameId: string) {
     const game = this.games.get(gameId);
-    if (!game) {
-      logger.game("Failed to broadcast - game not found", { gameId });
-      return;
-    }
+    if (!game) return;
 
-    logger.game("Broadcasting game state", {
-      gameId,
-      playerCount: game.players.size,
-    });
-
-    game.players.forEach((_, playerId) => {
-      logger.game("Emitting state to game room", {
-        gameId,
-        playerId,
-      });
-      this.io.to(playerId).emit("game:state", game);
+    this.io.to(gameId).emit("game:state", {
+      playerStates: game.playerStates,
+      confessions: game.confessions,
+      readyForNextStep: Array.from(game.readyForNextStep),
     });
   }
 }

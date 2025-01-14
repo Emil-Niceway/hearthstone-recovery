@@ -20,13 +20,8 @@ export default function App() {
     leaveLobby,
   } = useGameConnection();
 
-  const isInGame =
-    gameState?.phase === "preparation" ||
-    gameState?.phase === "combat" ||
-    gameState?.phase === "victory";
-
   useEffect(() => {
-    if (gameState?.phase === "preparation") {
+    if (gameState?.playerStates !== undefined) {
       // Instead of immediately showing game, wait for animation
       // Wait for exit animation to complete before showing game
       setTimeout(() => {
@@ -43,7 +38,7 @@ export default function App() {
   return (
     <div className="h-screen bg-black text-white">
       <AnimatePresence mode="wait">
-        {isInGame && gameState ? (
+        {gameState ? (
           <motion.div
             key="game"
             className="w-full h-full"
@@ -51,7 +46,7 @@ export default function App() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
           >
-            <GameView />
+            <GameView gameId={gameId} playerId={playerId} socket={socket} />
           </motion.div>
         ) : matchmakingStatus === "found" && !hasShownMatchFound ? (
           <MatchmakingScreen

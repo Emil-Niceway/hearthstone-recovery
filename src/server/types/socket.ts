@@ -13,6 +13,21 @@ export interface ServerToClientEvents {
   "lobby:message": (data: { playerId: string; message: string }) => void;
   "lobby:players": (players: Array<{ id: string; ready: boolean }>) => void;
   "lobby:typing": (data: { playerId: string; isTyping: boolean }) => void;
+  "game:step_update": (data: {
+    playerId: string;
+    gameId: string;
+    step: number;
+  }) => void;
+  "game:confession": (data: {
+    playerId: string;
+    gameId: string;
+    message: string;
+  }) => void;
+  "game:player_ready_for_step": (data: {
+    playerId: string;
+    gameId: string;
+    step: number;
+  }) => void;
   "game:starting": (gameId: string) => void;
   "game:state": (state: PlayerGameState) => void;
   "game:error": (message: string) => void;
@@ -27,6 +42,21 @@ export interface ClientToServerEvents {
   "lobby:message": (data: { gameId: string; message: string }) => void;
   "lobby:players": (gameId: string) => void;
   "lobby:typing": (data: { gameId: string; isTyping: boolean }) => void;
+  "game:step_update": (data: {
+    playerId: string;
+    gameId: string;
+    step: number;
+  }) => void;
+  "game:confession": (data: {
+    playerId: string;
+    gameId: string;
+    message: string;
+  }) => void;
+  "game:player_ready_for_step": (data: {
+    playerId: string;
+    gameId: string;
+    step: number;
+  }) => void;
   "game:starting": (gameId: string) => void;
   "game:join": (gameId: string) => void;
 }
